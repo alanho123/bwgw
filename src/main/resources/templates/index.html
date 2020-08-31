@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+
+</head>
+<p align="center">
+<body>
+BREEZE網頁 - BreezePay錢包<br>
+掃碼付款<br>
+</p>
+<p align="center">
+    <img th:src="${imageUrl}" />
+</p>
+<p id="txdata", th:text="'交易序號： ' + ${txId} + ''" align="center"/>
+
+<script th:inline="javascript">
+    let tx_id = [[${txId}]];
+</script>
+
+</body>
+<script type="text/javascript">
+    function refresh() {
+        let requestURL = "http://localhost:8888/result";
+        let dataJSON = {};
+
+        dataJSON["txId"] = tx_id;
+        let queryString = JSON.stringify(dataJSON);
+
+        $.ajax({
+            url: requestURL,
+            data: queryString,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            success: function (returnData) {
+                console.log(returnData);
+                if (returnData.code == '0000') {
+                    window.location.replace(returnData.url);
+                } else {
+                    $("#txdata").text("付款處理中...");
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.log(xhr.status);
+                console.log(thrownError);
+            }
+        });
+    }
+    setInterval(refresh,5000);//5秒刷新一次
+</script>
+</html>
